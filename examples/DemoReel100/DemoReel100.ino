@@ -26,6 +26,7 @@ CRGB leds[NUM_LEDS];
 #define FRAMES_PER_SECOND  120
 
 void setup() {
+  pinMode(3, INPUT);
   delay(3000); // 3 second delay for recovery
   
   // tell FastLED about the LED strip configuration
@@ -46,8 +47,17 @@ uint8_t gHue = 0; // rotating "base color" used by many of the patterns
   
 void loop()
 {
+  boolean pir = digitalRead(3); //Is there a person nearby?
+  
   // Call the current pattern function once, updating the 'leds' array
   gPatterns[gCurrentPatternNumber]();
+
+  if(pir == HIGH){
+    FastLED.setBrightness(50);
+  }
+  else {
+    FastLED.setBrightness(10);
+  }
 
   // send the 'leds' array out to the actual LED strip
   FastLED.show();  
