@@ -16,13 +16,12 @@ FASTLED_USING_NAMESPACE
 #endif
 
 #define DATA_PIN    6
-//#define CLK_PIN   4
 #define LED_TYPE    WS2811
 #define COLOR_ORDER GRB
-#define NUM_LEDS    300
+#define NUM_LEDS    600
 CRGB leds[NUM_LEDS];
 
-#define BRIGHTNESS          50
+#define BRIGHTNESS          255
 #define FRAMES_PER_SECOND  120
 
 void setup() {
@@ -31,7 +30,6 @@ void setup() {
   
   // tell FastLED about the LED strip configuration
   FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  //FastLED.addLeds<LED_TYPE,DATA_PIN,CLK_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
 
   // set master brightness control
   FastLED.setBrightness(BRIGHTNESS);
@@ -52,13 +50,6 @@ void loop()
   // Call the current pattern function once, updating the 'leds' array
   gPatterns[gCurrentPatternNumber]();
 
-  if(pir == HIGH){
-    FastLED.setBrightness(50);
-  }
-  else {
-    FastLED.setBrightness(10);
-  }
-
   // send the 'leds' array out to the actual LED strip
   FastLED.show();  
   // insert a delay to keep the framerate modest
@@ -66,7 +57,11 @@ void loop()
 
   // do some periodic updates
   EVERY_N_MILLISECONDS( 20 ) { gHue++; } // slowly cycle the "base color" through the rainbow
-  EVERY_N_SECONDS( 10 ) { nextPattern(); } // change patterns periodically
+//  EVERY_N_SECONDS( 10 ) { nextPattern(); } // change patterns periodically
+
+  if(pir == HIGH){
+    nextPattern();
+  }
 }
 
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
