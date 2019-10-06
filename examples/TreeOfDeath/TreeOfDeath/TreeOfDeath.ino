@@ -28,7 +28,7 @@ void setup() {
 
 // List of patterns to cycle through.  Each is defined as a separate function below.
 typedef void (*SimplePatternList[])();
-SimplePatternList gPatterns = { confetti, sinelon, juggle };
+SimplePatternList gPatterns = { testPallet, confetti, sinelon, juggle };
 
 uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
 uint8_t gHue = 0; // rotating "base color" used by many of the patterns
@@ -99,25 +99,22 @@ void testPallet()
 {
   // test pattern for wood tones
   fadeToBlackBy( leds, NUM_LEDS, 20);
-
-  leds[pos] += CRGB( gHue, 255, 192);
-
-leds[] += CRGB(255,139, 49);
-leds[] += CRGB(255,199,157);
-leds[] += CRGB(255,166, 97);
-leds[] += CRGB(255,111,  0);
-leds[] += CRGB(191, 83,  0);
-leds[] += CRGB( 61,225, 44);
-leds[] += CRGB(159,244,150);
-leds[] += CRGB(103,234, 89);
-leds[] += CRGB( 21,219,  0);
-leds[] += CRGB( 15,156,  0);
-leds[] += CRGB( 55,104,201);
-leds[] += CRGB(153,180,234);
-leds[] += CRGB( 95,136,216);
-leds[] += CRGB( 16, 74,188);
-leds[] += CRGB( 10, 50,127);
-  
+  // 16 color test pallete
+  leds[0] += CRGB(255,139, 49);
+  leds[1] += CRGB(255,199,157);
+  leds[2] += CRGB(255,166, 97);
+  leds[3] += CRGB(255,111,  0);
+  leds[4] += CRGB(191, 83,  0);
+  leds[5] += CRGB( 61,225, 44);
+  leds[6] += CRGB(159,244,150);
+  leds[7] += CRGB(103,234, 89);
+  leds[8] += CRGB( 21,219,  0);
+  leds[9] += CRGB( 15,156,  0);
+  leds[10] += CRGB( 55,104,201);
+  leds[11] += CRGB(153,180,234);
+  leds[12] += CRGB( 95,136,216);
+  leds[13] += CRGB( 16, 74,188);
+  leds[14] += CRGB( 10, 50,127);
 }
 
 void confetti() 
