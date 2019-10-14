@@ -12,7 +12,7 @@ FASTLED_USING_NAMESPACE
 #define NUM_LEDS    300
 CRGB leds[NUM_LEDS];
 
-#define BRIGHTNESS          50 //0-255, use > 50 when driven from Arduino
+#define BRIGHTNESS          255 //0-255, use > 50 when driven from Arduino
 #define FRAMES_PER_SECOND  240
 
 void setup() {
@@ -44,13 +44,15 @@ void loop()
   // insert a delay to keep the framerate modest
   FastLED.delay(1000/FRAMES_PER_SECOND);
   sounds = false;
+  sinelon();
+  FastLED.show();
 }
 
 void testPallet()
 {
-  //fadeToBlackBy( leds, NUM_LEDS, 50);
+  //fadeToBlackBy( leds, NUM_LEDS, 10);
   for(int i=0; i<NUM_LEDS; i++){
-    leds[i] += CHSV(40,255,255);
+    leds[i] += CHSV(15,255,255);
   }
 }
 
@@ -67,5 +69,5 @@ void sinelon()
   // a colored dot sweeping back and forth, with fading trails
   fadeToBlackBy( leds, NUM_LEDS, 20);
   int pos = beatsin16( 13, 0, NUM_LEDS-1 );
-  leds[pos] += CHSV( 20, 255, 192);
+  leds[pos] += CHSV( 40, 255, 192);
 }
