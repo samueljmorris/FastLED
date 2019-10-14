@@ -21,7 +21,7 @@ void setup() {
   delay(100); // 3 second delay for recovery
   
   // tell FastLED about the LED strip configuration
-  FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS); //.setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS); //.setCorrection(TypicalSMD5050);
 
   // set master brightness control
   FastLED.setBrightness(BRIGHTNESS);
@@ -29,7 +29,7 @@ void setup() {
 
 // List of patterns to cycle through.  Each is defined as a separate function below.
 typedef void (*SimplePatternList[])();
-SimplePatternList gPatterns = { testPallet, confetti, sinelon, juggle };
+SimplePatternList gPatterns = { testPallet };
 
 uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
 uint8_t gHue = 0; // rotating "base color" used by many of the patterns
@@ -101,21 +101,21 @@ void testPallet()
   // test pattern for wood tones
   fadeToBlackBy( leds, NUM_LEDS, 20);
   // 16 color test pallete
-  leds[0] += CHSV(26,81,100); //26 81 100 hsv
-  leds[1] += CHSV(26,39,100); //26 39 100 hsv
-  leds[2] += CHSV(26,62,100); //26 62 100 hsv
-  leds[3] += CHSV(26,100,100); //26 100 100 hsv
-  leds[4] += CHSV(26,100,75); //26 100 75 hsv
-  leds[5] += CHSV(115,83,100); //115 83 100 hsv
-  leds[6] += CHSV(95,59,96); //95 59 96 hsv
-  leds[7] += CHSV(114,62,92); //114 62 92 hsv
-  leds[8] += CHSV(114,100,86); //114 100 86 hsv
-  leds[9] += CHSV(114,100,61); //114 100 61 hsv
-  leds[10] += CHSV(220,73,79); //220 73 79 hsv
-  leds[11] += CHSV(220,35,92); //220 35 92 hsv
-  leds[12] += CHSV(220,56,85); //220 56 85 hsv
-  leds[13] += CHSV(220,92,74); //220 92 74 hsv
-  leds[14] += CHSV(219,92,50); //219 92 50 hsv
+  leds[0] += CHSV(0,255,128); //26 81 100 hsv
+  leds[1] += CHSV(2,255,128); //26 39 100 hsv
+  leds[2] += CHSV(4,255,128); //26 62 100 hsv
+  leds[3] += CHSV(6,255,128); //26 100 100 hsv
+  leds[4] += CHSV(8,255,128); //26 100 75 hsv
+  leds[5] += CHSV(10,255,128); //115 83 100 hsv
+  leds[6] += CHSV(12,255,128); //95 59 96 hsv
+  leds[7] += CHSV(14,255,128); //114 62 92 hsv
+  leds[8] += CHSV(16,255,128); //114 100 86 hsv
+  leds[9] += CHSV(18,255,128); //114 100 61 hsv
+  leds[10] += CHSV(20,255,128); //220 73 79 hsv
+  leds[11] += CHSV(22,255,128); //220 35 92 hsv
+  leds[12] += CHSV(24,255,128); //220 56 85 hsv
+  leds[13] += CHSV(26,255,128); //220 92 74 hsv
+  leds[14] += CHSV(28,255,128); //219 92 50 hsv
 }
 
 void confetti() 
