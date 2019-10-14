@@ -15,9 +15,6 @@ CRGB leds[NUM_LEDS];
 #define BRIGHTNESS          50 //0-255, use > 50 when driven from Arduino
 #define FRAMES_PER_SECOND  240
 
-//volatile boolean sounds;
-//volatile boolean isNearby;
-
 void setup() {
   pinMode(2, INPUT); //Sound sensor
   pinMode(3, INPUT); //PIR sensor
@@ -51,9 +48,9 @@ void loop()
 
 void testPallet()
 {
-  fadeToBlackBy( leds, NUM_LEDS, 50);
+  //fadeToBlackBy( leds, NUM_LEDS, 50);
   for(int i=0; i<NUM_LEDS; i++){
-    leds[i] += CHSV(i,255,128);
+    leds[i] += CHSV(40,255,255);
   }
 }
 
@@ -65,10 +62,10 @@ void hueShift()
   }
 }
 
-//void sound(){
-//  sounds = true;
-//}
-//
-//void nearby(){
-//  isNearby = true;
-//}
+void sinelon()
+{
+  // a colored dot sweeping back and forth, with fading trails
+  fadeToBlackBy( leds, NUM_LEDS, 20);
+  int pos = beatsin16( 13, 0, NUM_LEDS-1 );
+  leds[pos] += CHSV( 20, 255, 192);
+}
