@@ -34,9 +34,10 @@ void setup() {
 
 void loop()
 {
-  boolean sounds = digitalRead(2);
-  boolean isNearby = digitalRead(3);
+  boolean sounds = digitalRead(3);
+  boolean isNearby = digitalRead(2);
   if(sounds){
+    //delay(10);
     hueShift();
   }
   else{
@@ -58,8 +59,9 @@ void testPallet()
 
 void hueShift()
 {
+  fadeToBlackBy( leds, NUM_LEDS, 20);
   for(int i=0; i<NUM_LEDS; i++){
-    leds[i] = -leds[i];
+    leds[i].subtractFromRGB(5);
   }
 }
 
