@@ -15,14 +15,14 @@ CRGB leds[NUM_LEDS];
 #define BRIGHTNESS          50 //0-255, use > 50 when driven from Arduino
 #define FRAMES_PER_SECOND  240
 
-volatile boolean sounds;
-volatile boolean isNearby;
+//volatile boolean sounds;
+//volatile boolean isNearby;
 
 void setup() {
   pinMode(2, INPUT); //Sound sensor
   pinMode(3, INPUT); //PIR sensor
-  attachInterrupt(digitalPinToInterrupt(2), sound, RISING);
-  attachInterrupt(digitalPinToInterrupt(3), nearby, RISING);
+//  attachInterrupt(digitalPinToInterrupt(2), sound, RISING);
+//  attachInterrupt(digitalPinToInterrupt(3), nearby, RISING);
   delay(100); // 3 second delay for recovery
   
   // tell FastLED about the LED strip configuration
@@ -34,6 +34,8 @@ void setup() {
 
 void loop()
 {
+  boolean sounds = digitalRead(2);
+  boolean isNearby = digitalRead(3);
   if(sounds){
     hueShift();
   }
@@ -61,10 +63,10 @@ void hueShift()
   }
 }
 
-void sound(){
-  sounds = true;
-}
-
-void nearby(){
-  isNearby = true;
-}
+//void sound(){
+//  sounds = true;
+//}
+//
+//void nearby(){
+//  isNearby = true;
+//}
