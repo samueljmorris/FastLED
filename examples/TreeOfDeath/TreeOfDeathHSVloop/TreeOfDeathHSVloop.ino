@@ -51,7 +51,7 @@ void loop()
 
 void testPallet()
 {
-  fadeToBlackBy( leds, NUM_LEDS, 20);
+  fadeToBlackBy( leds, NUM_LEDS, 50);
   for(int i=0; i<NUM_LEDS; i++){
     leds[i] += CHSV(i,255,128);
   }
@@ -59,7 +59,7 @@ void testPallet()
 
 void hueShift()
 {
-  fadeToBlackBy( leds, NUM_LEDS, 20);
+  fadeLightBy( leds, NUM_LEDS, 10);
   for(int i=0; i<NUM_LEDS; i++){
     leds[i].subtractFromRGB(5);
   }
