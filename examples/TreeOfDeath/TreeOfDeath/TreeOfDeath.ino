@@ -9,13 +9,14 @@ FASTLED_USING_NAMESPACE
 #define DATA_PIN    6
 #define LED_TYPE    WS2811
 #define COLOR_ORDER GRB
-#define NUM_LEDS    300
+#define NUM_LEDS    235
 CRGB leds[NUM_LEDS];
 
 #define BRIGHTNESS          255 //0-255, use > 50 when driven from Arduino
 #define FRAMES_PER_SECOND  240
 
 void setup() {
+  pinMode(2, INPUT); //Sound sensor
   pinMode(3, INPUT); //PIR sensor
   delay(100); // 3 second delay for recovery
   
@@ -69,7 +70,7 @@ uint8_t gHue = 0; // rotating "base color" used by many of the patterns
 void loop()
 {
   boolean pir = digitalRead(3); //Is there a person nearby?
-  
+  boolean sound = digitalRead(2); //Audio?
   // Call the current pattern function once, updating the 'leds' array
   gPatterns[gCurrentPatternNumber]();
 
@@ -100,21 +101,21 @@ void testPallet()
   // test pattern for wood tones
   fadeToBlackBy( leds, NUM_LEDS, 20);
   // 16 color test pallete
-  leds[0] += CRGB(255,139, 49);
-  leds[1] += CRGB(255,199,157);
-  leds[2] += CRGB(255,166, 97);
-  leds[3] += CRGB(255,111,  0);
-  leds[4] += CRGB(191, 83,  0);
-  leds[5] += CRGB( 61,225, 44);
-  leds[6] += CRGB(159,244,150);
-  leds[7] += CRGB(103,234, 89);
-  leds[8] += CRGB( 21,219,  0);
-  leds[9] += CRGB( 15,156,  0);
-  leds[10] += CRGB( 55,104,201);
-  leds[11] += CRGB(153,180,234);
-  leds[12] += CRGB( 95,136,216);
-  leds[13] += CRGB( 16, 74,188);
-  leds[14] += CRGB( 10, 50,127);
+  leds[0] += CRGB(255,139, 49); //26 81 100 hsv
+  leds[1] += CRGB(255,199,157); //26 39 100 hsv
+  leds[2] += CRGB(255,166, 97); //26 62 100 hsv
+  leds[3] += CRGB(255,111,  0); //26 100 100 hsv
+  leds[4] += CRGB(191, 83,  0); //26 100 75 hsv
+  leds[5] += CRGB( 61,225, 44); //115 83 100 hsv
+  leds[6] += CRGB(159,244,150); //95 59 96 hsv
+  leds[7] += CRGB(103,234, 89); //114 62 92 hsv
+  leds[8] += CRGB( 21,219,  0); //114 100 86 hsv
+  leds[9] += CRGB( 15,156,  0); //114 100 61 hsv
+  leds[10] += CRGB( 55,104,201); //220 73 79 hsv
+  leds[11] += CRGB(153,180,234); //220 35 92 hsv
+  leds[12] += CRGB( 95,136,216); //220 56 85 hsv
+  leds[13] += CRGB( 16, 74,188); //220 92 74 hsv
+  leds[14] += CRGB( 10, 50,127); //219 92 50 hsv
 }
 
 void confetti() 
