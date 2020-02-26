@@ -59,9 +59,10 @@ void loop()
 
   EVERY_N_MILLISECONDS(100)
   {
-    //check pir
-    if (pir)
+    //check pir, check if max brightness
+    if (pir && BRIGHTNESS < 81)
     {
+      //PIR based brightness from 0 to 80 (0 to ~30%)
       BRIGHTNESS = BRIGHTNESS + 1;
       Serial.print("New brightness is: ");
       Serial.println(BRIGHTNESS);
