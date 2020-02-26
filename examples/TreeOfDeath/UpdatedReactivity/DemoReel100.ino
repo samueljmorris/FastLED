@@ -13,6 +13,9 @@ FASTLED_USING_NAMESPACE
 CRGB leds[NUM_LEDS];
 
 int BRIGHTNESS = 0; //0-255, use > 50 when driven from Arduino
+int soundLevel = 0;
+int maxSoundLevel = 0;
+
 #define FRAMES_PER_SECOND 240
 
 CRGBPalette16 currentPalette;
@@ -42,7 +45,7 @@ void setup()
   FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
 
   // set master brightness control
-  FastLED.setBrightness(BRIGHTNESS); //initial brightness off per Elmer
+  FastLED.setBrightness(BRIGHTNESS); //initial brightness is 0, off per Elmer
 }
 
 // List of patterns to cycle through.  Each is defined as a separate function below.
@@ -55,8 +58,9 @@ uint8_t gHue = 0;                  // rotating "base color" used by many of the 
 void loop()
 {
   boolean pir = digitalRead(2);    //Is there a person nearby?
-  int soundLevel = analogRead(A0); //Current mic level?
+  soundLevel = analogRead(A0); //Current mic level?
 
+//Routine to adjust brightness based off PIR value
   EVERY_N_MILLISECONDS(100)
   {
     //check pir, check if max brightness
@@ -67,7 +71,7 @@ void loop()
       Serial.print("New brightness is: ");
       Serial.println(BRIGHTNESS);
       // set master brightness control
-  FastLED.setBrightness(BRIGHTNESS);
+      FastLED.setBrightness(BRIGHTNESS);
     }
     //increment brightness if triggered
     else if (BRIGHTNESS > 0)
@@ -76,17 +80,41 @@ void loop()
       Serial.print("New brightness is: ");
       Serial.println(BRIGHTNESS);
       // set master brightness control
-  FastLED.setBrightness(BRIGHTNESS);
+      FastLED.setBrightness(BRIGHTNESS);
     }
     //else if brightness > 0 decrement brightness
   }
 
+  //Routine to adjust brightness based off audio level
+  //ceiling or sort for audio level (use max)
+  EVERY_N_MILLISECONDS(50)
+  {
+    maxSoundLevel = max(soundLevel, maxSoundLevel);
+    //map to acceptable brightness range
+    //map(value, fromLow, fromHigh, toLow, toHigh)
+    maxSoundLevel = map(maxSoundLevel, 100, 500, 0, 100);
+  }
+
+  //Routine to clear maxSoundLevel
+  EVERY_N_SECONDS(1)
+  {
+    maxSoundLevel = 0;
+  }
+
+  //Routine to adjust brightness from maxSoundLevel
   EVERY_N_MILLISECONDS(100)
+  {
+    FastLED.setBrightness(BRIGHTNESS + maxSoundLevel);
+  }
+
+  EVERY_N_MILLISECONDS(100) //DEBUG OUTPUTS
   {
     Serial.print("PIR Sensor state: ");
     Serial.println(pir);
     Serial.print("Raw sound level: ");
     Serial.println(soundLevel);
+    Serial.print("Max sound level: ");
+    Serial.println(maxSoundLevel);
   }
 
   // Call the current pattern function once, updating the 'leds' array
@@ -98,12 +126,8 @@ void loop()
   FastLED.delay(1000 / FRAMES_PER_SECOND);
 
   //do some periodic updates
-        EVERY_N_MILLISECONDS(10) { gHue++; } // slowly cycle the "base color" through the rainbow
-  EVERY_N_SECONDS(5) { nextPattern(); }      // change patterns periodically
-
-  //  if(pir == HIGH){
-  //    nextPattern();
-  //  }
+  EVERY_N_MILLISECONDS(10) { gHue++; }  // slowly cycle the "base color" through the rainbow
+  EVERY_N_SECONDS(5) { nextPattern(); } // change patterns periodically
 }
 
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
@@ -114,19 +138,21 @@ void nextPattern()
   gCurrentPatternNumber = (gCurrentPatternNumber + 1) % ARRAY_SIZE(gPatterns);
 }
 
+//The following animations are parametric, not pallete based. Using range of hues to compensate.
+
 void confetti()
 {
   // random colored speckles that blink in and fade smoothly
   fadeToBlackBy(leds, NUM_LEDS, 10);
   int pos = random16(NUM_LEDS);
-  leds[pos] += CHSV(gHue + random8(64), 200, 255);
+  leds[pos] += CHSV(gHue + random8(64), 200, 255); //plus random number up to 64
 }
 
 void sinelon()
 {
   // a colored dot sweeping back and forth, with fading trails
   fadeToBlackBy(leds, NUM_LEDS, 20);
-  int pos = beatsin16(13, 0, NUM_LEDS - 1);
+  int pos = beatsin16(13, 0, NUM_LEDS - 1); //change first parameter (bpm of sin wave) to audio level?
   leds[pos] += CHSV(gHue, 255, 192);
 }
 
@@ -137,7 +163,7 @@ void juggle()
   byte dothue = 0;
   for (int i = 0; i < 8; i++)
   {
-    leds[beatsin16(i + 7, 0, NUM_LEDS - 1)] |= CHSV(dothue, 200, 255);
+    leds[beatsin16(i + 7, 0, NUM_LEDS - 1)] |= CHSV(dothue, 200, 255); //change first parameter to audio level like above?
     dothue += 32;
   }
 }
