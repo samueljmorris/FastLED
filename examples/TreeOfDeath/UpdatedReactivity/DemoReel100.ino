@@ -22,8 +22,8 @@ int bufferSize = numSamples + 1; //size of buffer array
 
 int windowMin = 100; //approx 0.5vdc
 int windowMax = 600; //approx 2.123vdc
-int scaledMin = 0 //no added brightness
-int scaledMax = 150 //approx. 70% of brightness
+int scaledMin = 0; //no added brightness
+int scaledMax = 150; //approx. 70% of brightness
 
 #define FRAMES_PER_SECOND 240
 
@@ -110,7 +110,7 @@ void loop()
       Serial.print(i);
       Serial.print(" : ");
       Serial.print(samplingWindow[i]);
-      
+  //ABS(BUFFER)
       samplingWindow[i] = abs(samplingWindow[i]);
 
       Serial.println("Absolute value at buffer index ");
@@ -118,17 +118,31 @@ void loop()
       Serial.print(" : ");
       Serial.print(samplingWindow[i]);
 
+  //CONSTRAIN(BUFFER)
       samplingWindow[i] = constrain(samplingWindow[i], windowMin, windowMax);
 
-      Serial.println("Absolute value at buffer index ");
+      Serial.println("Constrained value at buffer index ");
       Serial.print(i);
       Serial.print(" : ");
       Serial.print(samplingWindow[i]);
 
-    }
-  //ABS(BUFFER)
-  //CONSTRAIN(BUFFER)
+  //MAP(BUFFER)
+      samplingWindow[i] = map(samplingWindow[i], windowMin, windowMax, scaledMin, scaledMax);
+
+      Serial.println("Mapped value at buffer index ");
+      Serial.print(i);
+      Serial.print(" : ");
+      Serial.print(samplingWindow[i]);
+
   //MAX(BUFFER)
+      samplingWindow[i] = max(samplingWindow[i], maxSoundLevel);
+      
+      Serial.println("Max sound level: ");
+      Serial.print(maxSoundLevel);
+
+  //finally, store max value in final index in maxSoundLevel
+      maxSoundLevel = samplingWindow[numSamples];
+    }
 
   //ceiling or sort for audio level (use max)
   EVERY_N_MILLISECONDS(50)
