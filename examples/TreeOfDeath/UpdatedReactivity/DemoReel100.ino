@@ -106,54 +106,54 @@ void loop()
     {
       samplingWindow[i] = soundLevel;
 
-      Serial.println("Value at buffer index ");
+      Serial.print("Value at buffer index ");
       Serial.print(i);
       Serial.print(" : ");
-      Serial.print(samplingWindow[i]);
+      Serial.println(samplingWindow[i]);
   //ABS(BUFFER)
       samplingWindow[i] = abs(samplingWindow[i]);
 
-      Serial.println("Absolute value at buffer index ");
+      Serial.print("Absolute value at buffer index ");
       Serial.print(i);
       Serial.print(" : ");
-      Serial.print(samplingWindow[i]);
+      Serial.println(samplingWindow[i]);
 
   //CONSTRAIN(BUFFER)
       samplingWindow[i] = constrain(samplingWindow[i], windowMin, windowMax);
 
-      Serial.println("Constrained value at buffer index ");
+      Serial.print("Constrained value at buffer index ");
       Serial.print(i);
       Serial.print(" : ");
-      Serial.print(samplingWindow[i]);
+      Serial.println(samplingWindow[i]);
 
   //MAP(BUFFER)
       samplingWindow[i] = map(samplingWindow[i], windowMin, windowMax, scaledMin, scaledMax);
 
-      Serial.println("Mapped value at buffer index ");
+      Serial.print("Mapped value at buffer index ");
       Serial.print(i);
       Serial.print(" : ");
-      Serial.print(samplingWindow[i]);
+      Serial.println(samplingWindow[i]);
 
   //MAX(BUFFER)
       samplingWindow[i] = max(samplingWindow[i], maxSoundLevel);
       
-      Serial.println("Max sound level: ");
-      Serial.print(maxSoundLevel);
+      Serial.print("Max sound level: ");
+      Serial.println(maxSoundLevel);
 
   //finally, store max value in final index in maxSoundLevel
       maxSoundLevel = samplingWindow[numSamples];
     }
 
-  //ceiling or sort for audio level (use max)
-  EVERY_N_MILLISECONDS(50)
-  {
-    //constrain maxSoundLevel to remove falling waveform
-    maxSoundLevel = constrain(maxSoundLevel, 240, 500); //values same as below mapping
-    maxSoundLevel = max(soundLevel, maxSoundLevel);
-    //map to acceptable brightness range
-    //map(value, fromLow, fromHigh, toLow, toHigh)
-    maxSoundLevel = map(maxSoundLevel, 240, 400, 0, 100);
-  }
+  // //ceiling or sort for audio level (use max)
+  // EVERY_N_MILLISECONDS(50)
+  // {
+  //   //constrain maxSoundLevel to remove falling waveform
+  //   maxSoundLevel = constrain(maxSoundLevel, 240, 500); //values same as below mapping
+  //   maxSoundLevel = max(soundLevel, maxSoundLevel);
+  //   //map to acceptable brightness range
+  //   //map(value, fromLow, fromHigh, toLow, toHigh)
+  //   maxSoundLevel = map(maxSoundLevel, 240, 400, 0, 100);
+  // }
 
   //Routine to clear maxSoundLevel
   EVERY_N_SECONDS(1)
