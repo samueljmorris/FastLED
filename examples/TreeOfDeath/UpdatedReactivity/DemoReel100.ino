@@ -89,10 +89,12 @@ void loop()
   //ceiling or sort for audio level (use max)
   EVERY_N_MILLISECONDS(50)
   {
+    //constrain maxSoundLevel to remove falling waveform
+    maxSoundLevel = constrain(maxSoundLevel, 240, 500); //values same as below mapping
     maxSoundLevel = max(soundLevel, maxSoundLevel);
     //map to acceptable brightness range
     //map(value, fromLow, fromHigh, toLow, toHigh)
-    maxSoundLevel = map(maxSoundLevel, 100, 500, 0, 100);
+    maxSoundLevel = map(maxSoundLevel, 240, 400, 0, 100);
   }
 
   //Routine to clear maxSoundLevel
