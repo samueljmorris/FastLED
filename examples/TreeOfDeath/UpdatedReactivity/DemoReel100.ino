@@ -18,7 +18,7 @@ int soundLevel = 0;
 int maxSoundLevel = 0;
 
 int numSamples = 100; //Number of samples to hold in buffer
-int bufferSize = numSamples + 1; //size of buffer array
+int bufferSize = numSamples - 1; //size of buffer array (n-1)
 
 int windowMin = 100; //approx 0.5vdc
 int windowMax = 600; //approx 2.123vdc
@@ -102,7 +102,7 @@ void loop()
   //10MS WINDOW/BUFFER
     int samplingWindow[numSamples];
   //STORE RAW DATA IN BUFFER
-    for (int i=0; i<bufferSize; i++)
+    for (int i=0; i<numSamples; i++)
     {
       samplingWindow[i] = soundLevel;
 
