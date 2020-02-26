@@ -12,8 +12,11 @@ FASTLED_USING_NAMESPACE
 #define NUM_LEDS    235 //strip length of actual tree prototype
 CRGB leds[NUM_LEDS];
 
-#define BRIGHTNESS          255 //0-255, use > 50 when driven from Arduino
+int BRIGHTNESS = 0; //0-255, use > 50 when driven from Arduino
 #define FRAMES_PER_SECOND  240
+
+CRGBPalette16 currentPalette;
+TBlendType currentBlending;
 
 //HSL/HSV values:
 //40 is upper bounds for amber (already kind of greenish)
@@ -38,7 +41,8 @@ void setup() {
   FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
 
   // set master brightness control
-  FastLED.setBrightness(BRIGHTNESS);
+  FastLED.setBrightness(BRIGHTNESS); //initial brightness off per Elmer
+
 }
 
 // // List of patterns to cycle through.  Each is defined as a separate function below.
@@ -52,6 +56,23 @@ void loop()
 {
   boolean pir = digitalRead(2); //Is there a person nearby?
   int soundLevel = analogRead(A0); //Current mic level?
+
+  EVERY_N_MILLISECONDS(100){
+    //check pir
+    if (pir){
+      BRIGHTNESS = BRIGHTNESS + 1;
+      Serial.print("New brightness is: ");
+      Serial.println(BRIGHTNESS);
+    }
+    //increment brightness if triggered
+    else if (BRIGHTNESS > 0){
+      BRIGHTNESS = BRIGHTNESS - 1;
+      Serial.print("New brightness is: ");
+      Serial.println(BRIGHTNESS);
+    }
+    //else if brightness > 0 decrement brightness
+  }
+
   EVERY_N_MILLISECONDS(100){
     Serial.print("PIR Sensor state: ");
     Serial.println(pir);
