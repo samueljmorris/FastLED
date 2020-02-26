@@ -13,8 +13,17 @@ FASTLED_USING_NAMESPACE
 CRGB leds[NUM_LEDS];
 
 int BRIGHTNESS = 0; //0-255, use > 50 when driven from Arduino
+
 int soundLevel = 0;
 int maxSoundLevel = 0;
+
+int numSamples = 100; //Number of samples to hold in buffer
+int bufferSize = numSamples + 1; //size of buffer array
+
+int windowMin = 100; //approx 0.5vdc
+int windowMax = 600; //approx 2.123vdc
+int scaledMin = 0 //no added brightness
+int scaledMax = 150 //approx. 70% of brightness
 
 #define FRAMES_PER_SECOND 240
 
@@ -39,6 +48,8 @@ void setup()
   //init proximity sensor, pin 2
   pinMode(2, INPUT);
   //init mic, analog a0
+  analogReference(INTERNAL2V56); //Use lower reference to expand sound dynamic range
+
   delay(100); // 3 second delay for recovery
 
   // tell FastLED about the LED strip configuration
@@ -86,6 +97,39 @@ void loop()
   }
 
   //Routine to adjust brightness based off audio level
+
+  //AMPLITUDE MEASURING SECTION
+  //10MS WINDOW/BUFFER
+    int samplingWindow[numSamples];
+  //STORE RAW DATA IN BUFFER
+    for (int i=0; i<bufferSize; i++)
+    {
+      samplingWindow[i] = soundLevel;
+
+      Serial.println("Value at buffer index ");
+      Serial.print(i);
+      Serial.print(" : ");
+      Serial.print(samplingWindow[i]);
+      
+      samplingWindow[i] = abs(samplingWindow[i]);
+
+      Serial.println("Absolute value at buffer index ");
+      Serial.print(i);
+      Serial.print(" : ");
+      Serial.print(samplingWindow[i]);
+
+      samplingWindow[i] = constrain(samplingWindow[i], windowMin, windowMax);
+
+      Serial.println("Absolute value at buffer index ");
+      Serial.print(i);
+      Serial.print(" : ");
+      Serial.print(samplingWindow[i]);
+
+    }
+  //ABS(BUFFER)
+  //CONSTRAIN(BUFFER)
+  //MAX(BUFFER)
+
   //ceiling or sort for audio level (use max)
   EVERY_N_MILLISECONDS(50)
   {
