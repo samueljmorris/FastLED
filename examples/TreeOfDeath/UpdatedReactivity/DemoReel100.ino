@@ -62,7 +62,7 @@ SimplePatternList gPatterns = {confetti, sinelon, juggle};
 
 uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
 uint8_t gHue = 0;                  // rotating "base color" used by many of the patterns
-bool pir = digitalRead(2);
+bool pir = false;
 
 void loop()
 {
@@ -101,13 +101,14 @@ void loop()
   //Routine to adjust brightness based off PIR value
   EVERY_N_MILLISECONDS(100)
   {
+    pir = digitalRead(2);
     //check pir, check if max brightness
-    if (pir && BRIGHTNESS < 81)
+    if (pir && BRIGHTNESS < 81) //what about pir and greater than 81?
     {
       //PIR based brightness from 0 to 80 (0 to ~30%)
       BRIGHTNESS = BRIGHTNESS + 1;
-      Serial.print("New brightness is: ");
-      Serial.println(BRIGHTNESS);
+      //Serial.print("New brightness is: ");
+      //Serial.println(BRIGHTNESS);
       // set master brightness control
       FastLED.setBrightness(BRIGHTNESS);
     }
@@ -115,8 +116,8 @@ void loop()
     else if (BRIGHTNESS > 0)
     {
       BRIGHTNESS = BRIGHTNESS - 1;
-      Serial.print("New brightness is: ");
-      Serial.println(BRIGHTNESS);
+      //Serial.print("New brightness is: ");
+      //Serial.println(BRIGHTNESS);
       // set master brightness control
       FastLED.setBrightness(BRIGHTNESS);
     }
