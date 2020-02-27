@@ -157,12 +157,13 @@ void nextPattern()
 
 //The following animations are parametric, not pallete based. Using range of hues to compensate.
 
+//This method adds up to 64 to hue value at random. how to ensure hue stays within range?
 void confetti()
 {
   // random colored speckles that blink in and fade smoothly
   fadeToBlackBy(leds, NUM_LEDS, 10);
   int pos = random16(NUM_LEDS);
-  leds[pos] += CHSV(gHue + random8(64), 200, 255); //plus random number up to 64
+  leds[pos] += CHSV(random8(40), 200, 255); //plus random number hue up to 40 per hue table above
 }
 
 void sinelon()
