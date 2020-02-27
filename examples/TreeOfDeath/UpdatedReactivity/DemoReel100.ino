@@ -17,8 +17,8 @@ int BRIGHTNESS = 0; //0-255, use > 50 when driven from Arduino
 int soundLevel = 0;
 int maxSoundLevel = 0;
 
-int numSamples = 100;            //Number of samples to hold in buffer
-int bufferSize = numSamples - 1; //size of buffer array (n-1)
+const int sampleWindow = 50; // Sample window width in mS (50 mS = 20Hz)
+unsigned int sample;         //current sound level during sample window
 
 int windowMin = 100; //approx 0.5vdc
 int windowMax = 600; //approx 2.123vdc
@@ -68,11 +68,41 @@ void setup()
 
 void loop()
 {
+  //First try regular loop execution, check latency. use EVERY_N_MILLISECONDS otherwise
+
+  unsigned long startMillis = millis(); // Start of sample window
+  unsigned int peakToPeak = 0;          // peak-to-peak level
+
+  unsigned int signalMax = 0;
+  unsigned int signalMin = 1024;
+
+  // collect data for 50 mS
+  while (millis() - startMillis < sampleWindow)
+  {
+    sample = analogRead(0);
+    if (sample < 1024) // toss out spurious readings
+    {
+      if (sample > signalMax)
+      {
+        signalMax = sample; // save just the max levels
+      }
+      else if (sample < signalMin)
+      {
+        signalMin = sample; // save just the min levels
+      }
+    }
+  }
+  peakToPeak = signalMax - signalMin; // max - min = peak-peak amplitude
+
+  peakToPeak = map(peakToPeak, 0, 1023, 0, 100);
+
+  Serial.println(peakToPeak);
+
   EVERY_N_MILLISECONDS(1)
   {
     boolean pir = digitalRead(2); //Is there a person nearby?
-    soundLevel = analogRead(A0);  //Current mic level?
-    Serial.println(soundLevel);
+    //soundLevel = analogRead(A0);  //Current mic level?
+    //Serial.println(soundLevel);
   }
 
   // //Routine to adjust brightness based off PIR value
@@ -160,10 +190,10 @@ void loop()
   // }
 
   //Routine to clear maxSoundLevel
-  EVERY_N_SECONDS(1)
-  {
-    maxSoundLevel = 0;
-  }
+  // EVERY_N_SECONDS(1)
+  // {
+  //   maxSoundLevel = 0;
+  // }
 
   // //Routine to adjust brightness from maxSoundLevel
   // EVERY_N_MILLISECONDS(100)
