@@ -14,16 +14,13 @@ CRGB leds[NUM_LEDS];
 
 int BRIGHTNESS = 0; //0-255, use > 50 when driven from Arduino
 
-int soundLevel = 0;
-int maxSoundLevel = 0;
-
 const int sampleWindow = 50; // Sample window width in mS (50 mS = 20Hz)
 unsigned int sample;         //current sound level during sample window
 
-int windowMin = 100; //approx 0.5vdc
-int windowMax = 600; //approx 2.123vdc
-int scaledMin = 0;   //no added brightness
-int scaledMax = 150; //approx. 70% of brightness
+int windowMin = 0;    //min value from ADC
+int windowMax = 1023; //max value from ADC
+int scaledMin = 0;    //no added brightness
+int scaledMax = 150;  //approx. 70% of brightness
 
 #define FRAMES_PER_SECOND 240
 
@@ -59,12 +56,13 @@ void setup()
   FastLED.setBrightness(BRIGHTNESS); //initial brightness is 0, off per Elmer
 }
 
-// // List of patterns to cycle through.  Each is defined as a separate function below.
-// typedef void (*SimplePatternList[])();
-// SimplePatternList gPatterns = {confetti, sinelon, juggle};
+// List of patterns to cycle through.  Each is defined as a separate function below.
+typedef void (*SimplePatternList[])();
+SimplePatternList gPatterns = {confetti, sinelon, juggle};
 
-// uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
-// uint8_t gHue = 0;                  // rotating "base color" used by many of the patterns
+uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
+uint8_t gHue = 0;                  // rotating "base color" used by many of the patterns
+bool pir = digitalRead(2);
 
 void loop()
 {
@@ -73,8 +71,8 @@ void loop()
   unsigned long startMillis = millis(); // Start of sample window
   unsigned int peakToPeak = 0;          // peak-to-peak level
 
-  unsigned int signalMax = 0;
-  unsigned int signalMin = 1024;
+  unsigned int signalMax = 0;    //running max for current window
+  unsigned int signalMin = 1024; //running min for current window
 
   // collect data for 50 mS
   while (millis() - startMillis < sampleWindow)
@@ -94,112 +92,36 @@ void loop()
   }
   peakToPeak = signalMax - signalMin; // max - min = peak-peak amplitude
 
-  peakToPeak = map(peakToPeak, 0, 1023, 0, 100);
+  peakToPeak = map(peakToPeak, windowMin, windowMax, scaledMin, scaledMax);
 
   Serial.println(peakToPeak);
 
-  EVERY_N_MILLISECONDS(1)
+  FastLED.setBrightness(BRIGHTNESS + peakToPeak); //not deterministic
+
+  //Routine to adjust brightness based off PIR value
+  EVERY_N_MILLISECONDS(100)
   {
-    boolean pir = digitalRead(2); //Is there a person nearby?
-    //soundLevel = analogRead(A0);  //Current mic level?
-    //Serial.println(soundLevel);
+    //check pir, check if max brightness
+    if (pir && BRIGHTNESS < 81)
+    {
+      //PIR based brightness from 0 to 80 (0 to ~30%)
+      BRIGHTNESS = BRIGHTNESS + 1;
+      Serial.print("New brightness is: ");
+      Serial.println(BRIGHTNESS);
+      // set master brightness control
+      FastLED.setBrightness(BRIGHTNESS);
+    }
+    //increment brightness if triggered
+    else if (BRIGHTNESS > 0)
+    {
+      BRIGHTNESS = BRIGHTNESS - 1;
+      Serial.print("New brightness is: ");
+      Serial.println(BRIGHTNESS);
+      // set master brightness control
+      FastLED.setBrightness(BRIGHTNESS);
+    }
+    //else if brightness > 0 decrement brightness
   }
-
-  // //Routine to adjust brightness based off PIR value
-  //   EVERY_N_MILLISECONDS(100)
-  //   {
-  //     //check pir, check if max brightness
-  //     if (pir && BRIGHTNESS < 81)
-  //     {
-  //       //PIR based brightness from 0 to 80 (0 to ~30%)
-  //       BRIGHTNESS = BRIGHTNESS + 1;
-  //       Serial.print("New brightness is: ");
-  //       Serial.println(BRIGHTNESS);
-  //       // set master brightness control
-  //       FastLED.setBrightness(BRIGHTNESS);
-  //     }
-  //     //increment brightness if triggered
-  //     else if (BRIGHTNESS > 0)
-  //     {
-  //       BRIGHTNESS = BRIGHTNESS - 1;
-  //       Serial.print("New brightness is: ");
-  //       Serial.println(BRIGHTNESS);
-  //       // set master brightness control
-  //       FastLED.setBrightness(BRIGHTNESS);
-  //     }
-  //     //else if brightness > 0 decrement brightness
-  //   }
-
-  // //Routine to adjust brightness based off audio level
-
-  // //AMPLITUDE MEASURING SECTION
-  // //10MS WINDOW/BUFFER
-  // int samplingWindow[numSamples];
-  // //STORE RAW DATA IN BUFFER
-  // for (int i = 0; i < numSamples; i++)
-  // {
-  //   samplingWindow[i] = soundLevel;
-
-  //   Serial.print("Value at buffer index ");
-  //   Serial.print(i);
-  //   Serial.print(" : ");
-  //   Serial.println(samplingWindow[i]);
-  //   //ABS(BUFFER)
-  //   samplingWindow[i] = abs(samplingWindow[i]);
-
-  //   Serial.print("Absolute value at buffer index ");
-  //   Serial.print(i);
-  //   Serial.print(" : ");
-  //   Serial.println(samplingWindow[i]);
-
-  //   //CONSTRAIN(BUFFER)
-  //   samplingWindow[i] = constrain(samplingWindow[i], windowMin, windowMax);
-
-  //   Serial.print("Constrained value at buffer index ");
-  //   Serial.print(i);
-  //   Serial.print(" : ");
-  //   Serial.println(samplingWindow[i]);
-
-  //   //MAP(BUFFER)
-  //   samplingWindow[i] = map(samplingWindow[i], windowMin, windowMax, scaledMin, scaledMax);
-
-  //   Serial.print("Mapped value at buffer index ");
-  //   Serial.print(i);
-  //   Serial.print(" : ");
-  //   Serial.println(samplingWindow[i]);
-
-  //   //MAX(BUFFER)
-  //   samplingWindow[i] = max(samplingWindow[i], maxSoundLevel);
-
-  //   Serial.print("Max sound level: ");
-  //   Serial.println(maxSoundLevel);
-
-  //   //finally, store max value in final index in maxSoundLevel
-  //   maxSoundLevel = samplingWindow[numSamples];
-  // }
-
-  // //ceiling or sort for audio level (use max)
-  // EVERY_N_MILLISECONDS(50)
-  // {
-  //   //constrain maxSoundLevel to remove falling waveform
-  //   maxSoundLevel = constrain(maxSoundLevel, 240, 500); //values same as below mapping
-  //   maxSoundLevel = max(soundLevel, maxSoundLevel);
-  //   //map to acceptable brightness range
-  //   //map(value, fromLow, fromHigh, toLow, toHigh)
-  //   maxSoundLevel = map(maxSoundLevel, 240, 400, 0, 100);
-  // }
-
-  //Routine to clear maxSoundLevel
-  // EVERY_N_SECONDS(1)
-  // {
-  //   maxSoundLevel = 0;
-  // }
-
-  // //Routine to adjust brightness from maxSoundLevel
-  // EVERY_N_MILLISECONDS(100)
-  // {
-  //   FastLED.setBrightness(BRIGHTNESS + maxSoundLevel);
-  // }
 
   //   EVERY_N_MILLISECONDS(100) //DEBUG OUTPUTS
   //   {
@@ -211,53 +133,53 @@ void loop()
   //     Serial.println(maxSoundLevel);
   //   }
 
-  //   // Call the current pattern function once, updating the 'leds' array
-  //   gPatterns[gCurrentPatternNumber]();
+  // Call the current pattern function once, updating the 'leds' array
+  gPatterns[gCurrentPatternNumber]();
 
-  //   // send the 'leds' array out to the actual LED strip
-  //   FastLED.show();
-  //   // insert a delay to keep the framerate modest
-  //   FastLED.delay(1000 / FRAMES_PER_SECOND);
+  // send the 'leds' array out to the actual LED strip
+  FastLED.show();
+  // insert a delay to keep the framerate modest
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
 
-  //   //do some periodic updates
-  //   EVERY_N_MILLISECONDS(10) { gHue++; }  // slowly cycle the "base color" through the rainbow
-  //   EVERY_N_SECONDS(5) { nextPattern(); } // change patterns periodically
-  // }
+  //do some periodic updates
+  EVERY_N_MILLISECONDS(10) { gHue++; }  // slowly cycle the "base color" through the rainbow
+  EVERY_N_SECONDS(5) { nextPattern(); } // change patterns periodically
+}
 
-  // #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
+#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
-  // void nextPattern()
-  // {
-  //   // add one to the current pattern number, and wrap around at the end
-  //   gCurrentPatternNumber = (gCurrentPatternNumber + 1) % ARRAY_SIZE(gPatterns);
-  // }
+void nextPattern()
+{
+  // add one to the current pattern number, and wrap around at the end
+  gCurrentPatternNumber = (gCurrentPatternNumber + 1) % ARRAY_SIZE(gPatterns);
+}
 
-  // //The following animations are parametric, not pallete based. Using range of hues to compensate.
+//The following animations are parametric, not pallete based. Using range of hues to compensate.
 
-  // void confetti()
-  // {
-  //   // random colored speckles that blink in and fade smoothly
-  //   fadeToBlackBy(leds, NUM_LEDS, 10);
-  //   int pos = random16(NUM_LEDS);
-  //   leds[pos] += CHSV(gHue + random8(64), 200, 255); //plus random number up to 64
-  // }
+void confetti()
+{
+  // random colored speckles that blink in and fade smoothly
+  fadeToBlackBy(leds, NUM_LEDS, 10);
+  int pos = random16(NUM_LEDS);
+  leds[pos] += CHSV(gHue + random8(64), 200, 255); //plus random number up to 64
+}
 
-  // void sinelon()
-  // {
-  //   // a colored dot sweeping back and forth, with fading trails
-  //   fadeToBlackBy(leds, NUM_LEDS, 20);
-  //   int pos = beatsin16(13, 0, NUM_LEDS - 1); //change first parameter (bpm of sin wave) to audio level?
-  //   leds[pos] += CHSV(gHue, 255, 192);
-  // }
+void sinelon()
+{
+  // a colored dot sweeping back and forth, with fading trails
+  fadeToBlackBy(leds, NUM_LEDS, 20);
+  int pos = beatsin16(13, 0, NUM_LEDS - 1); //change first parameter (bpm of sin wave) to audio level?
+  leds[pos] += CHSV(gHue, 255, 192);
+}
 
-  // void juggle()
-  // {
-  //   // eight colored dots, weaving in and out of sync with each other
-  //   fadeToBlackBy(leds, NUM_LEDS, 20);
-  //   byte dothue = 0;
-  //   for (int i = 0; i < 8; i++)
-  //   {
-  //     leds[beatsin16(i + 7, 0, NUM_LEDS - 1)] |= CHSV(dothue, 200, 255); //change first parameter to audio level like above?
-  //     dothue += 32;
-  //   }
+void juggle()
+{
+  // eight colored dots, weaving in and out of sync with each other
+  fadeToBlackBy(leds, NUM_LEDS, 20);
+  byte dothue = 0;
+  for (int i = 0; i < 8; i++)
+  {
+    leds[beatsin16(i + 7, 0, NUM_LEDS - 1)] |= CHSV(dothue, 200, 255); //change first parameter to audio level like above?
+    dothue += 32;
+  }
 }
