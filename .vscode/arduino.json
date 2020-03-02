@@ -1,7 +1,6 @@
 {
-    "board": "arduino:avr:mega",
-    "configuration": "cpu=atmega2560",
+    "board": "arduino:avr:micro",
     "programmer": "AVR ISP",
-    "sketch": "examples\\TreeOfDeath\\UpdatedReactivity\\DemoReel100.ino",
-    "port": "COM7"
+    "sketch": "examples\\TreeOfDeath\\UpdatedReactivity\\AudioProcessor\\AudioProcessor.ino",
+    "port": "COM11"
 }

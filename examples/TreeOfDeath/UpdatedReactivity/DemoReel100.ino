@@ -14,14 +14,6 @@ CRGB leds[NUM_LEDS];
 
 int BRIGHTNESS = 0; //0-255, use > 50 when driven from Arduino
 
-const int sampleWindow = 50; // Sample window width in mS (50 mS = 20Hz)
-unsigned int sample;         //current sound level during sample window
-
-int windowMin = 0;    //min value from ADC
-int windowMax = 1023; //max value from ADC
-int scaledMin = 0;    //no added brightness
-int scaledMax = 150;  //approx. 70% of brightness
-
 #define FRAMES_PER_SECOND 240
 
 CRGBPalette16 currentPalette;
@@ -41,11 +33,12 @@ TBlendType currentBlending;
 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(9600);
+  Serial1.begin(9600);
   //init proximity sensor, pin 2
   pinMode(2, INPUT);
   //init mic, analog a0
-  analogReference(INTERNAL2V56); //Use lower reference to expand sound dynamic range
+  //analogReference(INTERNAL2V56); //Use lower reference to expand sound dynamic range
 
   delay(100); // 3 second delay for recovery
 
@@ -66,37 +59,45 @@ bool pir = false;
 
 void loop()
 {
-  //First try regular loop execution, check latency. use EVERY_N_MILLISECONDS otherwise
+  // EVERY_N_MILLISECONDS(50)
+  // {
+  //   unsigned int peakToPeak = Serial1.parseInt();
+  //   FastLED.setBrightness(BRIGHTNESS + peakToPeak);
+  //   Serial.println(peakToPeak)
+  // }
 
-  unsigned long startMillis = millis(); // Start of sample window
-  unsigned int peakToPeak = 0;          // peak-to-peak level
+  // EVERY_N_MILLISECONDS(100)
+  // {
+  //   unsigned long startMillis = millis(); // Start of sample window
+  //   unsigned int peakToPeak = 0;          // peak-to-peak level
 
-  unsigned int signalMax = 0;    //running max for current window
-  unsigned int signalMin = 1024; //running min for current window
+  //   unsigned int signalMax = 0;    //running max for current window
+  //   unsigned int signalMin = 1024; //running min for current window
 
-  // collect data for 50 mS
-  while (millis() - startMillis < sampleWindow)
-  {
-    sample = analogRead(0);
-    if (sample < 1024) // toss out spurious readings
-    {
-      if (sample > signalMax)
-      {
-        signalMax = sample; // save just the max levels
-      }
-      else if (sample < signalMin)
-      {
-        signalMin = sample; // save just the min levels
-      }
-    }
-  }
-  peakToPeak = signalMax - signalMin; // max - min = peak-peak amplitude
+  //   // collect data for 50 mS
+  //   while (millis() - startMillis < sampleWindow)
+  //   {
+  //     sample = analogRead(0);
+  //     if (sample < 1024) // toss out spurious readings
+  //     {
+  //       if (sample > signalMax)
+  //       {
+  //         signalMax = sample; // save just the max levels
+  //       }
+  //       else if (sample < signalMin)
+  //       {
+  //         signalMin = sample; // save just the min levels
+  //       }
+  //     }
+  //   }
+  //   peakToPeak = signalMax - signalMin; // max - min = peak-peak amplitude
 
-  peakToPeak = map(peakToPeak, windowMin, windowMax, scaledMin, scaledMax);
+  //   peakToPeak = map(peakToPeak, windowMin, windowMax, scaledMin, scaledMax);
 
-  Serial.println(peakToPeak);
+  //   //Serial.println(peakToPeak);
 
-  FastLED.setBrightness(BRIGHTNESS + peakToPeak); //not deterministic
+  //   FastLED.setBrightness(BRIGHTNESS + peakToPeak); //not deterministic
+  // }
 
   //Routine to adjust brightness based off PIR value
   EVERY_N_MILLISECONDS(100)
@@ -107,8 +108,8 @@ void loop()
     {
       //PIR based brightness from 0 to 80 (0 to ~30%)
       BRIGHTNESS = BRIGHTNESS + 1;
-      //Serial.print("New brightness is: ");
-      //Serial.println(BRIGHTNESS);
+      Serial.print("New brightness is: ");
+      Serial.println(BRIGHTNESS);
       // set master brightness control
       FastLED.setBrightness(BRIGHTNESS);
     }
@@ -116,23 +117,23 @@ void loop()
     else if (BRIGHTNESS > 0)
     {
       BRIGHTNESS = BRIGHTNESS - 1;
-      //Serial.print("New brightness is: ");
-      //Serial.println(BRIGHTNESS);
+      Serial.print("New brightness is: ");
+      Serial.println(BRIGHTNESS);
       // set master brightness control
       FastLED.setBrightness(BRIGHTNESS);
     }
     //else if brightness > 0 decrement brightness
   }
 
-  //   EVERY_N_MILLISECONDS(100) //DEBUG OUTPUTS
-  //   {
-  //     Serial.print("PIR Sensor state: ");
-  //     Serial.println(pir);
-  //     Serial.print("Raw sound level: ");
-  //     Serial.println(soundLevel);
-  //     Serial.print("Max sound level: ");
-  //     Serial.println(maxSoundLevel);
-  //   }
+    EVERY_N_MILLISECONDS(100) //DEBUG OUTPUTS
+    {
+      Serial.print("PIR Sensor state: ");
+      Serial.println(pir);
+      // Serial.print("Raw sound level: ");
+      // Serial.println(soundLevel);
+      // Serial.print("Max sound level: ");
+      // Serial.println(maxSoundLevel);
+    }
 
   // Call the current pattern function once, updating the 'leds' array
   gPatterns[gCurrentPatternNumber]();
