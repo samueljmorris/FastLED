@@ -1,14 +1,17 @@
+int analogPin = 3; //pin to send amplitude
+
 const int sampleWindow = 50; // Sample window width in mS (50 mS = 20Hz)
 unsigned int sample;         //current sound level during sample window
 
-int windowMin = 0;    //min value from ADC
+int windowMin = 0;   //min value from ADC
 int windowMax = 600; //max value from ADC
-int scaledMin = 0;    //no added brightness
-int scaledMax = 150;  //approx. 70% of brightness
+int scaledMin = 0;   //no added brightness
+int scaledMax = 150; //PWM max value (255 = always on)
+// int scaledMax = 150;  //approx. 70% of brightness
 
 void setup()
 {
-    Serial.begin(9600);
+    //Serial.begin(115200);
 }
 
 void loop()
@@ -16,13 +19,13 @@ void loop()
     unsigned long startMillis = millis(); // Start of sample window
     unsigned int peakToPeak = 0;          // peak-to-peak level
 
-    unsigned int signalMax = 0;    //running max for current window
+    unsigned int signalMax = 0;   //running max for current window
     unsigned int signalMin = 600; //running min for current window
 
     // collect data for 50 mS
     while (millis() - startMillis < sampleWindow)
     {
-         sample = analogRead(0);
+        sample = analogRead(0);
         //  Serial.println(sample);
         sample = constrain(sample, 0, 600);
         if (sample < 600) // toss out spurious readings
@@ -41,5 +44,6 @@ void loop()
 
     peakToPeak = map(peakToPeak, windowMin, windowMax, scaledMin, scaledMax);
 
-    Serial.println(peakToPeak);
+    //Serial.print(peakToPeak, BIN); //writing out value as binary (1 byte no separator)
+    analogWrite(analogPin, peakToPeak); //send as pwm signal
 }

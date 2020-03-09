@@ -1,7 +1,7 @@
 {
-    "board": "arduino:avr:mega",
+    "board": "arduino:avr:nano",
     "programmer": "USBtinyISP",
-    "sketch": "examples\\TreeOfDeath\\UpdatedReactivity\\DemoReel100.ino",
-    "port": "COM7",
-    "configuration": "cpu=atmega2560"
+    "sketch": "examples\\TreeOfDeath\\UpdatedReactivity\\AudioProcessor\\AudioProcessor.ino",
+    "port": "COM13",
+    "configuration": "cpu=atmega328"
 }
