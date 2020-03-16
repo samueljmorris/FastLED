@@ -13,7 +13,7 @@ int analogPin = 0;   //analog input to read amplitude from
 int inputMin = 0;    //min value from ADC
 int inputMax = 1023; //max value from ADC
 int scaledMin = 0;   //no added brightness
-int scaledMax = 150; //approx. 70% of brightness
+int scaledMax = 70; //approx. 70% of brightness
 #define FRAMES_PER_SECOND 200
 //HSL/HSV values:
 //40 is upper bounds for amber (already kind of greenish)
