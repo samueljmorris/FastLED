@@ -14,7 +14,7 @@ int inputMin = 0;    //min value from ADC
 int inputMax = 1023; //max value from ADC
 int scaledMin = 0;   //no added brightness
 int scaledMax = 70; //approx. 70% of brightness
-#define FRAMES_PER_SECOND 200
+#define FRAMES_PER_SECOND 500
 //HSL/HSV values:
 //40 is upper bounds for amber (already kind of greenish)
 //30 is better
@@ -35,6 +35,7 @@ void setup()
   // tell FastLED about the LED strip configuration
   FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   // set master brightness control
+  FastLED.setDither( 0 ); //son of a
   FastLED.setBrightness(BRIGHTNESS); //initial brightness is 0, off per Elmer
 }
 
@@ -74,6 +75,7 @@ void loop()
     //else if brightness > 0 decrement brightness
   }
 
+  fadeToBlackBy( leds, NUM_LEDS, 20); //fade by 20/256ths
   //manually animate
   for (int dot = 0; dot < NUM_LEDS; dot++)
   {
