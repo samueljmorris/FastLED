@@ -14,6 +14,9 @@ int inputMin = 0;    //min value from ADC
 int inputMax = 1023; //max value from ADC
 int scaledMin = 0;   //no added brightness
 int scaledMax = 70; //approx. 70% of brightness
+
+unsigned int peakToPeak = 0;
+
 #define FRAMES_PER_SECOND 500
 //HSL/HSV values:
 //40 is upper bounds for amber (already kind of greenish)
@@ -46,7 +49,7 @@ void loop()
   //Routine to adjust brightness based off PIR value
   EVERY_N_MILLISECONDS(50)
   {
-    unsigned int peakToPeak = analogRead(analogPin);
+    peakToPeak = analogRead(analogPin);
     peakToPeak = map(peakToPeak, inputMin, inputMax, scaledMin, scaledMax);
     FastLED.setBrightness(BRIGHTNESS + peakToPeak);
     // Serial.println(BRIGHTNESS);
@@ -74,11 +77,19 @@ void loop()
     //else if brightness > 0 decrement brightness
   }
 
-  fadeToBlackBy( leds, NUM_LEDS, 20); //fade by 20/256ths
-  //manually animate
-  for (int dot = 0; dot < NUM_LEDS; dot++)
-  {
-    leds[dot] = CRGB::Red;
+  // fadeToBlackBy( leds, NUM_LEDS, 20); //fade by 20/256ths
+  // //manually animate
+  // for (int dot = 0; dot < NUM_LEDS; dot++)
+  // {
+  //   leds[dot] = CRGB::Red;
+  // }
+
+  // eight colored dots, weaving in and out of sync with each other
+  fadeToBlackBy( leds, NUM_LEDS, 10);
+  byte dothue = 0;
+  for( int i = 0; i < 5; i++) {
+    leds[beatsin16( (i += peakToPeak), 0, NUM_LEDS-1 )] |= CHSV(dothue, 200, 255);
+    dothue += 1;
   }
   // send the 'leds' array out to the actual LED strip
   FastLED.show();
