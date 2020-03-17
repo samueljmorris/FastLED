@@ -15,7 +15,10 @@ int inputMax = 1023; //max value from ADC
 int scaledMin = 0;   //no added brightness
 int scaledMax = 70; //approx. 70% of brightness
 
-unsigned int peakToPeak = 0;
+int peakToPeak = 0;
+int animationSpeed = 0;
+int animationMin = 1;
+int animationMax = 9;
 
 #define FRAMES_PER_SECOND 500
 //HSL/HSV values:
@@ -84,11 +87,13 @@ void loop()
   //   leds[dot] = CRGB::Red;
   // }
 
+animationSpeed = map(peakToPeak, scaledMin, scaledMax, animationMin, animationMax);
+
   // eight colored dots, weaving in and out of sync with each other
   fadeToBlackBy( leds, NUM_LEDS, 10);
   byte dothue = 0;
   for( int i = 0; i < 5; i++) {
-    leds[beatsin16( (i += peakToPeak), 0, NUM_LEDS-1 )] |= CHSV(dothue, 200, 255);
+    leds[beatsin16( (i + animationSpeed), 0, NUM_LEDS-1 )] |= CHSV(dothue, 200, 255);
     dothue += 1;
   }
   // send the 'leds' array out to the actual LED strip
