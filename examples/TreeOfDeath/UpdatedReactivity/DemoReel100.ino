@@ -28,7 +28,7 @@ int scaledMax = 70; //approx. 70% of brightness
 //255 red
 void setup()
 {
-  Serial.begin(115200);
+  //Serial.begin(115200);
   //init proximity sensor, pin 2
   pinMode(2, INPUT);
   delay(100); // 3 second delay for recovery
@@ -39,7 +39,6 @@ void setup()
   FastLED.setBrightness(BRIGHTNESS); //initial brightness is 0, off per Elmer
 }
 
-uint8_t gHue = 0; // rotating "base color" used by many of the patterns
 bool pir = false;
 
 void loop()
@@ -61,7 +60,7 @@ void loop()
       //Serial.print("New brightness is: ");
       //Serial.println(BRIGHTNESS);
       // set master brightness control
-      FastLED.setBrightness(BRIGHTNESS);
+      FastLED.setBrightness(BRIGHTNESS + peakToPeak);
     }
     //increment brightness if triggered
     else if (BRIGHTNESS > 0)
@@ -70,7 +69,7 @@ void loop()
       // Serial.print("New brightness is: ");
       // Serial.println(BRIGHTNESS);
       // set master brightness control
-      FastLED.setBrightness(BRIGHTNESS);
+      FastLED.setBrightness(BRIGHTNESS + peakToPeak);
     }
     //else if brightness > 0 decrement brightness
   }
