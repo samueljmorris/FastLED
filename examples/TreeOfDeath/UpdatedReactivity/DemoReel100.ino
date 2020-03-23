@@ -91,10 +91,10 @@ animationSpeed = map(peakToPeak, scaledMin, scaledMax, animationMin, animationMa
 
   // eight colored dots, weaving in and out of sync with each other
   fadeToBlackBy( leds, NUM_LEDS, 10);
-  byte dothue = 0;
+  byte dothue = 180;
   for( int i = 0; i < 5; i++) {
     leds[beatsin16( (i + animationSpeed), 0, NUM_LEDS-1 )] |= CHSV(dothue, 200, 255);
-    dothue += 1;
+    dothue += 15;
   }
   // send the 'leds' array out to the actual LED strip
   FastLED.show();
